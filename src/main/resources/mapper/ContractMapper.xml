@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 这里 namespace 必须和你的 Mapper 接口全类名一样 -->
+<mapper namespace="com.example.contractalert.biz.Mapper.ContractMapper">
+
+    <!-- 预警等级统计 -->
+    <select id="levelStat" resultType="com.example.contractalert.api.DTO.ContractLevelStatDTO">
+        SELECT
+            alert_level AS level,
+            CASE alert_level
+                WHEN 1 THEN '正常'
+                WHEN 2 THEN '预警'
+                WHEN 3 THEN '紧急'
+                ELSE '未知'
+                END AS levelName,
+            COUNT(*) AS count
+        FROM esd_contract_alert
+        WHERE del_flag = 0
+        GROUP BY alert_level
+        ORDER BY alert_level DESC
+    </select>
+
+</mapper>

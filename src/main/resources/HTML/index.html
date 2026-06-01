@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同预警管理系统 - 纬致科技</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1e3a5f;
+            --primary-light: #2d5a87;
+            --primary-dark: #152a45;
+            --accent-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --bg-light: #f8fafc;
+            --text-gray: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf0 100%);
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            padding: 12px 24px;
+            box-shadow: 0 4px 20px rgba(30, 58, 95, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .top-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .top-header .logo h1 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .top-header .logo i {
+            font-size: 28px;
+            color: #60a5fa;
+        }
+
+        .top-header .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .top-header .search-box {
+            position: relative;
+        }
+
+        .top-header .search-box input {
+            width: 300px;
+            padding: 8px 40px 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .top-header .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .top-header .search-box input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            width: 350px;
+        }
+
+        .top-header .search-box button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .top-header .user-info {
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-header .user-info i {
+            font-size: 20px;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            min-height: calc(100vh - 70px);
+            padding: 24px 0;
+            position: fixed;
+            left: 0;
+            top: 70px;
+            width: 220px;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav-item {
+            list-style: none;
+            margin-bottom: 4px;
+        }
+
+        .sidebar .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 14px 24px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-item a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding-left: 30px;
+        }
+
+        .sidebar .nav-item a.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: #fff;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .sidebar .nav-item a i {
+            width: 24px;
+            font-size: 18px;
+            margin-right: 12px;
+        }
+
+        .sidebar .nav-item .badge {
+            margin-left: auto;
+            font-size: 12px;
+            padding: 2px 8px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            margin-left: 220px;
+            margin-top: 70px;
+            padding: 24px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* 统计卡片 */
+        .stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-blue) 0%, #1d4ed8 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card.stat-normal .stat-icon {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: var(--success-green);
+        }
+
+        .stat-card.stat-warning .stat-icon {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: var(--warning-orange);
+        }
+
+        .stat-card.stat-urgent .stat-icon {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: var(--danger-red);
+        }
+
+        .stat-card.stat-total .stat-icon {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: var(--accent-blue);
+        }
+
+        .stat-card .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        /* 卡片样式 */
+        .content-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .content-card .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-card .card-header h3 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-card .card-header h3 i {
+            font-size: 20px;
+        }
+
+        .content-card .card-body {
+            padding: 24px;
+        }
+
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead th {
+            background: #f8fafc;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-gray);
+            font-size: 14px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .data-table tbody td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1d4ed8 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-orange) 0%, #d97706 100%);
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        /* 徽章样式 */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-orange);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+
+        /* 搜索区域 */
+        .search-area {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            gap: 4px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .pagination .page-item {
+            margin: 0;
+        }
+
+        .pagination .page-link {
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .pagination .page-link:hover {
+            background: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        /* 隐藏内容区域 */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* 弹窗样式 */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--warning-orange) 0%, #d97706 100%);
+            color: #fff;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header .btn-close {
+            color: #fff;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="top-header">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="logo">
+                <i class="fa fa-file-text-o"></i>
+                <h1>合同预警管理系统</h1>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" id="header-search" placeholder="搜索员工工号或姓名..." onkeyup="if(event.keyCode===13) headerSearch()">
+                    <button onclick="headerSearch()"><i class="fa fa-search"></i></button>
+                </div>
+                <div class="user-info">
+                    <i class="fa fa-user-circle-o"></i>
+                    <span>管理员</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 侧边栏导航 -->
+    <aside class="sidebar">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="#contractList" class="active" onclick="showSection('contractList')">
+                    <i class="fa fa-list-alt"></i>
+                    <span>合同列表</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#addContract" onclick="showSection('addContract')">
+                    <i class="fa fa-plus-circle"></i>
+                    <span>添加合同</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#statistics" onclick="showSection('statistics')">
+                    <i class="fa fa-bar-chart"></i>
+                    <span>统计分析</span>
+                    <span class="badge bg-warning">New</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#followManage" onclick="showSection('followManage')">
+                    <i class="fa fa-tasks"></i>
+                    <span>跟进管理</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#dataExport" onclick="showSection('dataExport')">
+                    <i class="fa fa-download"></i>
+                    <span>数据导出</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 1. 合同列表 -->
+        <section id="contractList" class="content-section active">
+            <div class="content-card">
+                <div class="card-header">
+                    <h3><i class="fa fa-list-alt"></i> 合同预警列表</h3>
+                    <div>
+                        <span class="text-white/80 text-sm">共 <span id="total-count">0</span> 条记录</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- 搜索区域 -->
+                    <div class="search-area">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>员工工号</label>
+                                    <input type="text" id="search-empNo" class="form-control" placeholder="请输入员工工号">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>员工姓名</label>
+                                    <input type="text" id="search-empName" class="form-control" placeholder="请输入员工姓名">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>预警等级</label>
+                                    <select id="search-alertLevel" class="form-control">
+                                        <option value="">全部等级</option>
+                                        <option value="1">正常</option>
+                                        <option value="2">预警</option>
+                                        <option value="3">紧急</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>续签状态</label>
+                                    <select id="search-isRenewed" class="form-control">
+                                        <option value="">全部状态</option>
+                                        <option value="0">未续签</option>
+                                        <option value="1">已续签</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12 d-flex justify-content-end gap-2">
+                                <button class="btn btn-primary" onclick="searchContract()">
+                                    <i class="fa fa-search"></i> 搜索
+                                </button>
+                                <button class="btn btn-secondary" onclick="resetSearch()">
+                                    <i class="fa fa-refresh"></i> 重置
+                                </button>
+                                <button class="btn btn-success" onclick="showSection('addContract')">
+                                    <i class="fa fa-plus"></i> 添加合同
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 数据表格 -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>员工工号</th>
+                                    <th>员工姓名</th>
+                                    <th>部门</th>
+                                    <th>合同开始</th>
+                                    <th>合同结束</th>
+                                    <th>剩余天数</th>
+                                    <th>预警等级</th>
+                                    <th>是否续签</th>
+                                    <th>跟进状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contract-table-body">
+                                <tr>
+                                    <td colspan="10" class="text-center py-8 text-gray">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <span class="text-gray text-sm">显示第 1-10 条，共 <span id="total-count-2">0</span> 条记录</span>
+                        <nav>
+                            <ul class="pagination" id="pagination">
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 添加合同 -->
+        <section id="addContract" class="content-section">
+            <div class="content-card">
+                <div class="card-header">
+                    <h3><i class="fa fa-plus-circle"></i> 添加合同预警</h3>
+                </div>
+                <div class="card-body">
+                    <form id="addForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>员工工号 <span class="text-danger">*</span></label>
+                                    <input type="text" id="add-empNo" class="form-control" required placeholder="请输入员工工号">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>员工姓名 <span class="text-danger">*</span></label>
+                                    <input type="text" id="add-empName" class="form-control" required placeholder="请输入员工姓名">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>部门名称</label>
+                            <input type="text" id="add-deptName" class="form-control" placeholder="请输入部门名称">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>合同开始日期 <span class="text-danger">*</span></label>
+                                    <input type="date" id="add-contractStart" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>合同结束日期 <span class="text-danger">*</span></label>
+                                    <input type="date" id="add-contractEnd" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary" onclick="resetAddForm()">取消</button>
+                            <button type="button" class="btn btn-success" onclick="addContract()">
+                                <i class="fa fa-save"></i> 保存
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 统计分析 -->
+        <section id="statistics" class="content-section">
+            <h3 class="mb-4" style="color: var(--primary-color); font-weight: 600;"><i class="fa fa-bar-chart"></i> 预警统计分析</h3>
+            
+            <!-- 统计卡片 -->
+            <div class="row mb-6">
+                <div class="col-md-3">
+                    <div class="stat-card stat-normal">
+                        <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
+                        <div class="stat-value" id="stat-normal">-</div>
+                        <div class="stat-label">正常 (<30天)</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-warning">
+                        <div class="stat-icon"><i class="fa fa-exclamation-circle"></i></div>
+                        <div class="stat-value" id="stat-warning">-</div>
+                        <div class="stat-label">预警 (7-30天)</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-urgent">
+                        <div class="stat-icon"><i class="fa fa-times-circle"></i></div>
+                        <div class="stat-value" id="stat-urgent">-</div>
+                        <div class="stat-label">紧急 (<=7天)</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-total">
+                        <div class="stat-icon"><i class="fa fa-users"></i></div>
+                        <div class="stat-value" id="stat-total">-</div>
+                        <div class="stat-label">合同总数</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 续签统计 -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3><i class="fa fa-pie-chart"></i> 续签状态统计</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 text-center">
+                                    <div style="display: inline-block; width: 100px; height: 100px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 32px; font-weight: 700; color: var(--success-green);" id="stat-renewed">-</span>
+                                    </div>
+                                    <p class="mt-3 text-success font-medium">已续签</p>
+                                </div>
+                                <div class="col-md-6 text-center">
+                                    <div style="display: inline-block; width: 100px; height: 100px; border-radius: 50%; background: rgba(245, 158, 11, 0.1); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 32px; font-weight: 700; color: var(--warning-orange);" id="stat-unrenewed">-</span>
+                                    </div>
+                                    <p class="mt-3 text-warning font-medium">未续签</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3><i class="fa fa-bar-chart"></i> 跟进状态统计</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="space-y-3">
+                                <div class="d-flex justify-content-between items-center p-3 bg-gray-50 rounded-lg">
+                                    <span style="color: var(--text-gray);">待跟进</span>
+                                    <span class="badge badge-secondary" id="stat-follow-wait">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between items-center p-3 bg-blue-50 rounded-lg">
+                                    <span style="color: var(--text-gray);">已联系</span>
+                                    <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);" id="stat-follow-contact">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between items-center p-3 bg-yellow-50 rounded-lg">
+                                    <span style="color: var(--text-gray);">协商中</span>
+                                    <span class="badge badge-warning" id="stat-follow-negotiate">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between items-center p-3 bg-green-50 rounded-lg">
+                                    <span style="color: var(--text-gray);">已完成</span>
+                                    <span class="badge badge-success" id="stat-follow-done">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 跟进管理 -->
+        <section id="followManage" class="content-section">
+            <div class="content-card">
+                <div class="card-header">
+                    <h3><i class="fa fa-tasks"></i> 跟进管理</h3>
+                </div>
+                <div class="card-body">
+                    <!-- 筛选 -->
+                    <div class="search-area">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>跟进状态</label>
+                                    <select id="follow-filter-status" class="form-control">
+                                        <option value="">全部状态</option>
+                                        <option value="待跟进">待跟进</option>
+                                        <option value="已联系">已联系</option>
+                                        <option value="协商中">协商中</option>
+                                        <option value="已完成">已完成</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>续签状态</label>
+                                    <select id="follow-filter-renewed" class="form-control">
+                                        <option value="">全部续签状态</option>
+                                        <option value="0">未续签</option>
+                                        <option value="1">已续签</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-4">
+                                <button class="btn btn-primary" onclick="loadFollowList()">
+                                    <i class="fa fa-refresh"></i> 刷新列表
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 跟进列表 -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>员工工号</th>
+                                    <th>员工姓名</th>
+                                    <th>合同结束</th>
+                                    <th>剩余天数</th>
+                                    <th>预警等级</th>
+                                    <th>是否续签</th>
+                                    <th>跟进状态</th>
+                                    <th>跟进备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="follow-table-body">
+                                <tr>
+                                    <td colspan="9" class="text-center py-8 text-gray">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 数据导出 -->
+        <section id="dataExport" class="content-section">
+            <div class="content-card">
+                <div class="card-header">
+                    <h3><i class="fa fa-download"></i> 数据导出</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%); border-radius: 16px; padding: 40px; text-align: center; border: 2px dashed rgba(16, 185, 129, 0.2);">
+                                <i class="fa fa-file-excel-o" style="font-size: 64px; color: var(--success-green); margin-bottom: 20px;"></i>
+                                <h4 style="color: var(--primary-color); font-weight: 600; margin-bottom: 10px;">导出数据</h4>
+                                <p style="color: var(--text-gray); margin-bottom: 24px;">导出所有合同预警数据（包含跟进记录）为Excel文件</p>
+                                <button class="btn btn-success btn-lg" onclick="exportExcel()">
+                                    <i class="fa fa-download"></i> 导出Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <div class="content-card">
+                            <div style="padding: 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                <h4 style="color: var(--primary-color); font-weight: 600; margin: 0;"><i class="fa fa-info-circle"></i> 导出说明</h4>
+                            </div>
+                            <div class="card-body">
+                                <ul style="list-style: none; padding: 0; color: var(--text-gray);">
+                                    <li style="padding: 8px 0; display: flex; align-items: center;"><i class="fa fa-check-circle text-success mr-2"></i> 每次导出最多支持500条数据</li>
+                                    <li style="padding: 8px 0; display: flex; align-items: center;"><i class="fa fa-check-circle text-success mr-2"></i> 导出格式为Excel (.xlsx)</li>
+                                    <li style="padding: 8px 0; display: flex; align-items: center;"><i class="fa fa-check-circle text-success mr-2"></i> 包含所有字段信息，包括跟进备注</li>
+                                    <li style="padding: 8px 0; display: flex; align-items: center;"><i class="fa fa-check-circle text-success mr-2"></i> 建议定期导出备份数据</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 跟进弹窗 -->
+    <div class="modal fade" id="followModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa fa-edit"></i> 跟进处理</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="followForm">
+                        <input type="hidden" id="follow-id">
+                        <div class="form-group">
+                            <label>是否续签 <span class="text-danger">*</span></label>
+                            <div style="display: flex; gap: 24px;">
+                                <label class="form-check-label" style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="radio" name="isRenewed" value="1" checked class="form-check-input" style="width: 18px; height: 18px;">
+                                    <span>已续签</span>
+                                </label>
+                                <label class="form-check-label" style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="radio" name="isRenewed" value="0" class="form-check-input" style="width: 18px; height: 18px;">
+                                    <span>不续签</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>跟进状态</label>
+                            <select id="follow-followStatus" class="form-control">
+                                <option value="待跟进">待跟进</option>
+                                <option value="已联系">已联系</option>
+                                <option value="协商中">协商中</option>
+                                <option value="已完成">已完成</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>跟进备注</label>
+                            <textarea id="follow-followNote" class="form-control" rows="3" placeholder="请输入跟进备注（不续签时必填）"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-warning" onclick="followContract()">确认跟进</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const baseUrl = '/contract';
+        let currentPage = 1;
+        let currentPageSize = 10;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.sidebar .nav-item a').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[href="#${sectionId}"]`).classList.add('active');
+            
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'contractList') loadContractList();
+            else if (sectionId === 'statistics') loadStatistics();
+            else if (sectionId === 'followManage') loadFollowList();
+        }
+
+        function getAlertLevelBadge(level) {
+            const badges = {
+                1: '<span class="badge badge-success">正常</span>',
+                2: '<span class="badge badge-warning">预警</span>',
+                3: '<span class="badge badge-danger">紧急</span>'
+            };
+            return badges[level] || '<span class="badge" style="background: #e2e8f0; color: #64748b;">未知</span>';
+        }
+
+        function getIsRenewedText(val) {
+            return val == 1 ? '已续签' : '未续签';
+        }
+
+        function loadStatistics() {
+            fetch(`${baseUrl}/levelStat`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const stats = data.data || [];
+                        let normal = 0, warning = 0, urgent = 0, total = 0;
+                        stats.forEach(stat => {
+                            if (stat.level === 1) normal = stat.count;
+                            if (stat.level === 2) warning = stat.count;
+                            if (stat.level === 3) urgent = stat.count;
+                            total += stat.count;
+                        });
+                        document.getElementById('stat-normal').textContent = normal;
+                        document.getElementById('stat-warning').textContent = warning;
+                        document.getElementById('stat-urgent').textContent = urgent;
+                        document.getElementById('stat-total').textContent = total;
+                    }
+                })
+                .catch(err => console.error('统计加载失败:', err));
+            
+            fetch(`${baseUrl}/page?pageNum=1&pageSize=9999`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const list = data.data.records || [];
+                        let renewed = 0, unrenewed = 0;
+                        let followWait = 0, followContact = 0, followNegotiate = 0, followDone = 0;
+                        list.forEach(item => {
+                            if (item.isRenewed == 1) renewed++;
+                            else unrenewed++;
+                            
+                            switch(item.followStatus) {
+                                case '待跟进': followWait++; break;
+                                case '已联系': followContact++; break;
+                                case '协商中': followNegotiate++; break;
+                                case '已完成': followDone++; break;
+                            }
+                        });
+                        document.getElementById('stat-renewed').textContent = renewed;
+                        document.getElementById('stat-unrenewed').textContent = unrenewed;
+                        document.getElementById('stat-follow-wait').textContent = followWait;
+                        document.getElementById('stat-follow-contact').textContent = followContact;
+                        document.getElementById('stat-follow-negotiate').textContent = followNegotiate;
+                        document.getElementById('stat-follow-done').textContent = followDone;
+                    }
+                })
+                .catch(err => console.error('跟进统计加载失败:', err));
+        }
+
+        function loadContractList(pageNum = 1) {
+            currentPage = pageNum;
+            const paramObj = {
+                pageNum: pageNum,
+                pageSize: currentPageSize,
+                empNo: document.getElementById('search-empNo').value || null,
+                empName: document.getElementById('search-empName').value || null,
+                alertLevel: document.getElementById('search-alertLevel').value ? parseInt(document.getElementById('search-alertLevel').value) : null,
+                isRenewed: document.getElementById('search-isRenewed').value ? parseInt(document.getElementById('search-isRenewed').value) : null
+            };
+            
+            const params = new URLSearchParams();
+            Object.keys(paramObj).forEach(key => {
+                if (paramObj[key] !== null && paramObj[key] !== undefined) {
+                    params.append(key, paramObj[key]);
+                }
+            });
+
+            fetch(`${baseUrl}/page?${params}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const page = data.data;
+                        const list = page.records || [];
+                        document.getElementById('total-count').textContent = page.total || 0;
+                        document.getElementById('total-count-2').textContent = page.total || 0;
+                        renderContractTable(list);
+                        renderPagination(page);
+                    }
+                })
+                .catch(err => console.error('请求错误:', err));
+        }
+
+        function renderContractTable(list) {
+            const tbody = document.getElementById('contract-table-body');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8" style="color: var(--text-gray);">暂无数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = list.map(item => `
+                <tr>
+                    <td>${item.empNo}</td>
+                    <td>${item.empName}</td>
+                    <td>${item.deptName || '-'}</td>
+                    <td>${item.contractStart || '-'}</td>
+                    <td>${item.contractEnd || '-'}</td>
+                    <td>${item.remainDays || '-'}</td>
+                    <td>${getAlertLevelBadge(item.alertLevel)}</td>
+                    <td>${getIsRenewedText(item.isRenewed)}</td>
+                    <td>${item.followStatus || '-'}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="showFollowModal('${item.id}')">
+                            <i class="fa fa-edit"></i> 跟进
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination(page) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            const totalPages = page.pages || 1;
+            const current = page.current || 1;
+            
+            if (totalPages <= 1) return;
+            
+            if (current > 1) {
+                pagination.innerHTML += `<li class="page-item"><a class="page-link" onclick="loadContractList(${current - 1})">上一页</a></li>`;
+            }
+            
+            for (let i = 1; i <= totalPages; i++) {
+                pagination.innerHTML += `<li class="page-item ${i === current ? 'active' : ''}"><a class="page-link" onclick="loadContractList(${i})">${i}</a></li>`;
+            }
+            
+            if (current < totalPages) {
+                pagination.innerHTML += `<li class="page-item"><a class="page-link" onclick="loadContractList(${current + 1})">下一页</a></li>`;
+            }
+        }
+
+        function searchContract() {
+            loadContractList(1);
+            document.getElementById('search-empNo').value = '';
+            document.getElementById('search-empName').value = '';
+            document.getElementById('search-alertLevel').value = '';
+            document.getElementById('search-isRenewed').value = '';
+        }
+
+        function resetSearch() {
+            document.getElementById('search-empNo').value = '';
+            document.getElementById('search-empName').value = '';
+            document.getElementById('search-alertLevel').value = '';
+            document.getElementById('search-isRenewed').value = '';
+            loadContractList(1);
+        }
+
+        function addContract() {
+            const empNo = document.getElementById('add-empNo').value;
+            const empName = document.getElementById('add-empName').value;
+            const contractStart = document.getElementById('add-contractStart').value;
+            const contractEnd = document.getElementById('add-contractEnd').value;
+            
+            if (!empNo || !empName || !contractStart || !contractEnd) {
+                alert('请填写带 * 的必填字段');
+                return;
+            }
+
+            const data = {
+                empNo: empNo,
+                empName: empName,
+                deptName: document.getElementById('add-deptName').value,
+                contractStart: contractStart,
+                contractEnd: contractEnd
+            };
+
+            fetch(`${baseUrl}/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('已成功添加');
+                    resetAddForm();
+                } else {
+                    alert(data.msg || '添加失败');
+                }
+            })
+            .catch(err => alert('添加失败: ' + err.message));
+        }
+
+        function resetAddForm() {
+            document.getElementById('addForm').reset();
+        }
+
+        function showFollowModal(id) {
+            document.getElementById('followForm').reset();
+            document.getElementById('follow-id').value = id;
+            new bootstrap.Modal(document.getElementById('followModal')).show();
+        }
+
+        function followContract() {
+            const isRenewed = parseInt(document.querySelector('input[name="isRenewed"]:checked').value);
+            const followNote = document.getElementById('follow-followNote').value;
+            const followId = document.getElementById('follow-id').value;
+            
+            console.log('follow-id value:', followId);
+            console.log('parseInt follow-id:', parseInt(followId));
+            
+            if (isRenewed === 0 && !followNote.trim()) {
+                alert('不续签时必须填写跟进备注');
+                return;
+            }
+
+            const data = {
+                id: followId,
+                isRenewed: isRenewed,
+                followStatus: document.getElementById('follow-followStatus').value,
+                followNote: followNote
+            };
+
+            console.log('Sending data:', JSON.stringify(data));
+
+            fetch(`${baseUrl}/follow`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('跟进成功');
+                    bootstrap.Modal.getInstance(document.getElementById('followModal')).hide();
+                    loadContractList();
+                    loadStatistics();
+                    loadFollowList();
+                } else {
+                    alert(data.msg || '跟进失败');
+                }
+            })
+            .catch(err => alert('跟进失败: ' + err.message));
+        }
+
+        function loadFollowList() {
+            const paramObj = {
+                pageNum: 1,
+                pageSize: 9999,
+                followStatus: document.getElementById('follow-filter-status').value || null,
+                isRenewed: document.getElementById('follow-filter-renewed').value ? parseInt(document.getElementById('follow-filter-renewed').value) : null
+            };
+            
+            const params = new URLSearchParams();
+            Object.keys(paramObj).forEach(key => {
+                if (paramObj[key] !== null && paramObj[key] !== undefined) {
+                    params.append(key, paramObj[key]);
+                }
+            });
+
+            fetch(`${baseUrl}/page?${params}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const list = data.data.records || [];
+                        renderFollowTable(list);
+                    }
+                })
+                .catch(err => console.error('跟进列表加载失败:', err));
+        }
+
+        function renderFollowTable(list) {
+            const tbody = document.getElementById('follow-table-body');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8" style="color: var(--text-gray);">暂无数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = list.map(item => `
+                <tr>
+                    <td>${item.empNo}</td>
+                    <td>${item.empName}</td>
+                    <td>${item.contractEnd || '-'}</td>
+                    <td>${item.remainDays || '-'}</td>
+                    <td>${getAlertLevelBadge(item.alertLevel)}</td>
+                    <td>${getIsRenewedText(item.isRenewed)}</td>
+                    <td>${item.followStatus || '-'}</td>
+                    <td>${item.followNote || '-'}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="showFollowModal('${item.id}')">
+                            <i class="fa fa-edit"></i> 编辑
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function exportExcel() {
+            window.location.href = `${baseUrl}/export`;
+        }
+
+        function headerSearch() {
+            const keyword = document.getElementById('header-search').value.trim();
+            if (!keyword) {
+                alert('请输入搜索关键词');
+                return;
+            }
+            
+            document.getElementById('search-empNo').value = keyword;
+            document.getElementById('search-empName').value = keyword;
+            showSection('contractList');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            loadContractList();
+        });
+    </script>
+</body>
+</html>
